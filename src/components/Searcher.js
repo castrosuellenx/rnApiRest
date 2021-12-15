@@ -7,27 +7,56 @@ import {
   StyleSheet,
 } from 'react-native';
 
-export default function Searcher({street, neighborhood, city, state}) {
-  const [cep, setCep] = useState();
+import apiCep from '../services/api';
+
+export default function Searcher() {
+  const [searchCep, setSearchCep] = useState();
+  const [infoCep, setInfoCep] = useState('');
+  const [invalidCep, setInvalidCep] = useState();
+
+  const getCep = async () => {
+    const {data} = await apiCep.get(`${searchCep}/json/`);
+    setInfoCep(data);
+  };
+
+  const onInvalidCep = () => {
+    if (searchCep != '') {
+      var validCep = /^[0-9]{8}$/;
+
+      if (validCep.test(searchCep)) {
+        setInvalidCep(false);
+      } else {
+        setInvalidCep(true);
+      }
+    } else {
+      setInvalidCep(true);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        onChangeText={setCep}
-        value={cep}
+        onChangeText={setSearchCep}
+        value={searchCep}
         placeholder="Digite o CEP"
+        onEndEditing={onInvalidCep}
       />
 
-      <TouchableOpacity style={styles.button}>
+      {invalidCep && <Text style={styles.desc}>Digite um CEP válido</Text>}
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={getCep}
+        disabled={invalidCep}>
         <Text style={styles.buttonText}>Buscar</Text>
       </TouchableOpacity>
 
       <View style={{width: '70%'}}>
-        <Text style={styles.desc}>{`Rua: ${street || ''}`}</Text>
-        <Text style={styles.desc}>{`Bairro: ${neighborhood || ''}`}</Text>
-        <Text style={styles.desc}>{`Cidade: ${city || ''}`}</Text>
-        <Text style={styles.desc}>{`Estado: ${state || ''}`}</Text>
+        <Text style={styles.desc}>Rua: {infoCep.logradouro}</Text>
+        <Text style={styles.desc}>Bairro: {infoCep.bairro}</Text>
+        <Text style={styles.desc}>Cidade: {infoCep.localidade}</Text>
+        <Text style={styles.desc}>Estado: {infoCep.uf}</Text>
       </View>
     </View>
   );
