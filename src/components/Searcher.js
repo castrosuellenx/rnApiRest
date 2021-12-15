@@ -40,7 +40,7 @@ export default function Searcher() {
         onChangeText={setSearchCep}
         value={searchCep}
         placeholder="Digite o CEP"
-        onEndEditing={onInvalidCep}
+        onSelectionChange={onInvalidCep}
       />
 
       {invalidCep && <Text style={styles.desc}>Digite um CEP válido</Text>}
@@ -93,5 +93,6 @@ const styles = StyleSheet.create({
   desc: {
     color: '#FFFFFF',
     textAlign: 'left',
+    marginVertical: '2%',
   },
 });
